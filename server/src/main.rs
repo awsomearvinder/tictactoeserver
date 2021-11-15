@@ -19,11 +19,6 @@ struct AppState {
     games: DashMap<GameId, Game>,
 }
 
-//async fn connect(Extension(state): Extension<Arc<AppState>>) -> impl IntoResponse {
-//    let uid = Uuid::new_v4();
-//    state.users.write().await.push(UserId(uid));
-//}
-
 /// Entry point for the server, this runs on the runtime we started in main.
 async fn async_main() {
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
