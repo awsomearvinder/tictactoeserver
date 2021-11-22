@@ -21,3 +21,7 @@ version = "1.13.0"
 [dependencies.uuid]
 features = ["v4"]
 version = "0.8"
+
+[dependencies.tower-http]
+version = "0.1"
+features = ["cors"]

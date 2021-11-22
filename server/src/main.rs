@@ -3,6 +3,7 @@ use std::{net::SocketAddr, sync::Arc};
 use axum::{AddExtensionLayer, Router};
 use dashmap::DashMap;
 use tokio::sync::RwLock;
+use tower_http::cors::{any, CorsLayer, Origin};
 
 mod connect;
 mod game;
@@ -31,6 +32,7 @@ async fn async_main() {
 
     let router = Router::new()
         .route("/connect", axum::routing::get(connect::connect))
+        .layer(CorsLayer::new().allow_origin(any()).allow_methods(any()))
         .layer(AddExtensionLayer::new(state));
 
     axum::Server::bind(&addr)
