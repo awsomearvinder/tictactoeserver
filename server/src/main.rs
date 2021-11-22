@@ -12,7 +12,7 @@ pub(crate) use game::{Game, GameId, UserId};
 struct AppState {
     // RwLock, since we *rarely* add or remove userid's (hopefully), let's optimize for
     // the readers case. :)
-    // tl;dr with a Mutex<> you need to acquire the lock to get a read only *or* a write
+    // tl;dr with a Mutex you need to acquire the lock to get a read only *or* a write
     // only reference, but a RwLock will let you get as many read only's as you want, as long as
     // no writer exists. Conversely, a writer must wait until no readers exist.
     waiting_users: RwLock<Vec<UserId>>,
