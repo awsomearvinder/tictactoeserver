@@ -7,8 +7,11 @@ use dashmap::DashMap;
 use tokio::sync::RwLock;
 use tower_http::cors::{any, CorsLayer, Origin};
 
+mod client_info;
 mod connect;
 mod game;
+
+pub(crate) use client_info::ClientInfo;
 pub(crate) use game::{Game, GameId, UserId};
 
 #[derive(Default)]
@@ -18,7 +21,7 @@ struct AppState {
     // tl;dr with a Mutex you need to acquire the lock to get a read only *or* a write
     // only reference, but a RwLock will let you get as many read only's as you want, as long as
     // no writer exists. Conversely, a writer must wait until no readers exist.
-    waiting_users: RwLock<Vec<UserId>>,
+    waiting_clients: RwLock<Vec<ClientInfo>>,
     games: DashMap<GameId, Game>,
 }
 
