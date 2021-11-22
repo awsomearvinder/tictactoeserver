@@ -25,3 +25,7 @@ version = "0.8"
 [dependencies.tower-http]
 version = "0.1"
 features = ["cors"]
+
+[dependencies.axum-server]
+version = "0.3"
+features = ["tls-rustls"]

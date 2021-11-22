@@ -1,6 +1,8 @@
 use std::{net::SocketAddr, sync::Arc};
 
 use axum::{AddExtensionLayer, Router};
+use axum_server::tls_rustls::RustlsConfig;
+
 use dashmap::DashMap;
 use tokio::sync::RwLock;
 use tower_http::cors::{any, CorsLayer, Origin};
@@ -30,12 +32,16 @@ async fn async_main() {
     // But I don't really care. :) Both work fine.
     let state = Arc::new(AppState::default());
 
+    let config = RustlsConfig::from_pem_file("certs/cert.pem", "certs/key.pem")
+        .await
+        .unwrap();
+
     let router = Router::new()
         .route("/connect", axum::routing::get(connect::connect))
         .layer(CorsLayer::new().allow_origin(any()).allow_methods(any()))
         .layer(AddExtensionLayer::new(state));
 
-    axum::Server::bind(&addr)
+    axum_server::bind_rustls(addr, config)
         .serve(router.into_make_service())
         .await
         .unwrap();
