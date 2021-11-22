@@ -5,7 +5,7 @@ use axum_server::tls_rustls::RustlsConfig;
 
 use dashmap::DashMap;
 use tokio::sync::RwLock;
-use tower_http::cors::{any, CorsLayer, Origin};
+use tower_http::cors::{any, CorsLayer};
 
 mod client_info;
 mod connect;
