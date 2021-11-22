@@ -61,9 +61,10 @@ pub(crate) async fn connect(Extension(state): Extension<Arc<AppState>>) -> Json<
         other_player
     };
 
-    state
-        .games
-        .insert(client_player.game_id, Game::new(player_turn));
+    state.games.insert(
+        client_player.game_id,
+        Game::new(player_turn, [client_player.user_id, other_player.user_id]),
+    );
 
     Json(ConnectResponse {
         client_info: client_player,

@@ -14,12 +14,15 @@ use std::sync::Arc;
 use crate::{GameId, UserId};
 
 #[derive(serde::Serialize)]
-pub(crate) struct PollResponse {
-    current_game_state: crate::Game,
+#[serde(tag = "kind")]
+pub(crate) enum PollResponse {
+    ActiveGame { game: crate::Game },
+    WaitingForGame,
 }
 
 pub(crate) enum PollError {
     BadGameId(GameId),
+    BadUserId(UserId),
 }
 impl IntoResponse for PollError {
     type Body = Full<Bytes>;
@@ -28,7 +31,11 @@ impl IntoResponse for PollError {
         match self {
             Self::BadGameId(id) => (
                 StatusCode::BAD_REQUEST,
-                Json(json!({"errorKind": "InvalidGameID", "gameId": id})),
+                Json(json!({"kind": "InvalidGameID", "gameId": id})),
+            ),
+            Self::BadUserId(id) => (
+                StatusCode::BAD_REQUEST,
+                Json(json!({"kind": "InvalidUserId", "userId": id})),
             ),
         }
         .into_response()
@@ -45,12 +52,21 @@ pub(crate) async fn poll(
     Extension(state): Extension<Arc<AppState>>,
     Query(client_info): Query<GameInfo>,
 ) -> Result<Json<PollResponse>, PollError> {
-    let game_state = if let Some(v) = state.games.get(&client_info.game_id) {
-        v
+    if let Some(game_state) = state.games.get(&client_info.game_id) {
+        if game_state.players.iter().all(|&n| n != client_info.user_id) {
+            Err(PollError::BadUserId(client_info.user_id))
+        } else {
+            Ok(Json(PollResponse::ActiveGame { game: *game_state }))
+        }
+    } else if state
+        .waiting_clients
+        .read()
+        .await
+        .iter()
+        .any(|&n| n.user_id == client_info.user_id)
+    {
+        Ok(Json(PollResponse::WaitingForGame))
     } else {
-        return Err(PollError::BadGameId(client_info.game_id));
-    };
-    Ok(Json(PollResponse {
-        current_game_state: *game_state,
-    }))
+        Err(PollError::BadGameId(client_info.game_id))
+    }
 }

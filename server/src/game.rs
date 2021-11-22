@@ -44,12 +44,19 @@ impl<'de> serde::Deserialize<'de> for UserId {
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, serde::Serialize)]
 pub struct Game {
-    active_turn: UserId,
+    pub active_turn: UserId,
+    pub board: [[Option<UserId>; 3]; 3],
+    pub players: [UserId; 2],
 }
 
 impl Game {
-    pub fn new(turn: UserId) -> Self {
-        Self { active_turn: turn }
+    pub fn new(turn: UserId, players: [UserId; 2]) -> Self {
+        assert!(players.iter().any(|&n| n == turn));
+        Self {
+            active_turn: turn,
+            board: [[None; 3]; 3],
+            players,
+        }
     }
 }
 
