@@ -10,6 +10,7 @@ use tower_http::cors::{any, CorsLayer};
 mod client_info;
 mod connect;
 mod game;
+mod mover;
 mod poll;
 
 pub(crate) use client_info::ClientInfo;
@@ -23,7 +24,7 @@ struct AppState {
     // only reference, but a RwLock will let you get as many read only's as you want, as long as
     // no writer exists. Conversely, a writer must wait until no readers exist.
     waiting_clients: RwLock<Vec<ClientInfo>>,
-    games: DashMap<GameId, Game>,
+    games: DashMap<GameId, std::sync::Mutex<Game>>,
 }
 
 /// Entry point for the server, this runs on the runtime we started in main.
@@ -41,6 +42,7 @@ async fn async_main() {
         .unwrap();
 
     let router = Router::new()
+        .route("/move", axum::routing::get(mover::make_move))
         .route("/connect", axum::routing::get(connect::connect))
         .route("/poll", axum::routing::get(poll::poll))
         .layer(CorsLayer::new().allow_origin(any()).allow_methods(any()))

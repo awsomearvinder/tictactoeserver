@@ -53,6 +53,7 @@ pub(crate) async fn poll(
     Query(client_info): Query<GameInfo>,
 ) -> Result<Json<PollResponse>, PollError> {
     if let Some(game_state) = state.games.get(&client_info.game_id) {
+        let game_state = game_state.lock().unwrap();
         if game_state.players.iter().all(|&n| n != client_info.user_id) {
             Err(PollError::BadUserId(client_info.user_id))
         } else {

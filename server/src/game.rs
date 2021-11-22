@@ -58,6 +58,12 @@ impl Game {
             players,
         }
     }
+    pub fn make_move(&mut self, x: usize, y: usize) -> Option<()> {
+        self.board[y][x] = Some(self.active_turn);
+        let &new_player_turn = self.players.iter().find(|&&n| n != self.active_turn)?;
+        self.active_turn = new_player_turn;
+        Some(())
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
