@@ -10,6 +10,7 @@ use tower_http::cors::{any, CorsLayer, Origin};
 mod client_info;
 mod connect;
 mod game;
+mod poll;
 
 pub(crate) use client_info::ClientInfo;
 pub(crate) use game::{Game, GameId, UserId};
@@ -41,6 +42,7 @@ async fn async_main() {
 
     let router = Router::new()
         .route("/connect", axum::routing::get(connect::connect))
+        .route("/poll", axum::routing::get(poll::poll))
         .layer(CorsLayer::new().allow_origin(any()).allow_methods(any()))
         .layer(AddExtensionLayer::new(state));
 
