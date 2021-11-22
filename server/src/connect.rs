@@ -31,7 +31,6 @@ pub struct ConnectResponse {
 /// of poor design where I'm already planning on just trusting the client, I don't care.
 pub(crate) async fn connect(Extension(state): Extension<Arc<AppState>>) -> Json<ConnectResponse> {
     let mut waiting_users = state.waiting_clients.write().await;
-    let game_id = GameId(Uuid::new_v4());
     let other_player = match waiting_users.pop() {
         Some(user) => user,
 
@@ -62,7 +61,9 @@ pub(crate) async fn connect(Extension(state): Extension<Arc<AppState>>) -> Json<
         other_player
     };
 
-    state.games.insert(game_id, Game::new(player_turn));
+    state
+        .games
+        .insert(client_player.game_id, Game::new(player_turn));
 
     Json(ConnectResponse {
         client_info: client_player,
