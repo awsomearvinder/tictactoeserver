@@ -21,7 +21,7 @@ struct AppState {
 
 /// Entry point for the server, this runs on the runtime we started in main.
 async fn async_main() {
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
 
     // This state is shared across all routes, hence why it's atomically reference counted.
     // (We're using a multithreaded runtime.)
